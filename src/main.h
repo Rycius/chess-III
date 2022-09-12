@@ -28,7 +28,7 @@
 
 
 #if MY_DEBUG
-// TODO(casey): Complete assertion macro - don't worry everyone!
+// coppied from HandmadeHero project. Sorry 
 #define Assert(Expression) if(!(Expression)) {*(volatile int *)0 = 0;}
 #else
 #define Assert(Expression)
