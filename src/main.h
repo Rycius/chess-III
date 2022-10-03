@@ -21,11 +21,6 @@
 #define v3 Vector3
 #define v4 Vector4
 
-#define Vec2(x, y)       (Vector2){(x), (y)}
-#define Vec3(x, y, z)    (Vector3){(x), (y), (z)}
-#define Vec4(x, y, z, w) (Vector4){(x), (y), (z), (w)}
-#define Rec(x, y, w, h)  (Rectangle){(x), (y), (w), (h)}
-
 
 #if MY_DEBUG
 // coppied from HandmadeHero project. Sorry 
@@ -36,35 +31,50 @@
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 
-// inline v2 Vec2(float x, float y)
-// {
-//     v2 result = (v2){x, y};
+#define internal static
 
-//     return result;
-// }
+internal inline v2 Vec2(float x, float y)
+{
+    return (v2){x, y};
+}
 
-// inline v3 Vec3(float x, float y, float z)
-// {
-//     v3 result = (v3){x, y, z};
+internal inline v2 Vec2()
+{
+    return (v2){0.0f, 0.0f};
+}
 
-//     return result;
-// }
+internal inline v3 Vec3(float x, float y, float z)
+{
+    return (v3){x, y, z};
+}
 
-// inline v4 Vec4(float x, float y, float z, float w)
-// {
-//     v4 result = (v4){x, y, z, w};
+internal inline v3 Vec3()
+{
+    return (v3){0.0f, 0.0f, 0.0f};
+}
 
-//     return result;
-// }
+internal inline v4 Vec4(float x, float y, float z, float w)
+{
+    return (v4){x, y, z, w};
+}
 
-// inline Rectangle Rec(int x, int y, int width, int height)
-// {
-//     Rectangle result = (Rectangle){x, y, width, height};
+internal inline Rectangle Rec(float x, float y, float width, float height)
+{
+    return (Rectangle){x, y, width, height};
+}
 
-//     return result;
-// }
+internal inline Rectangle Rec(v2 pos, float width, float height)
+{
+    return (Rectangle){pos.x, pos.y, width, height};
+}
 
-inline int Clamp(int value, int min, int max)
+internal inline Rectangle Rec(v2 pos, v2 dim)
+{
+    return (Rectangle){pos.x, pos.y, dim.x, dim.y};
+}
+
+
+internal inline int Clamp(int value, int min, int max)
 {
     if(value < min) return min;
     if(value > max) return max;
