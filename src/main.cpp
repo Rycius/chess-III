@@ -1,4 +1,4 @@
-#define MY_DEBUG 1
+#define MY_DEBUG 0
 
 #include "main.h"
 #include "gui.cpp"

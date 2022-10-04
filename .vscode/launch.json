@@ -8,7 +8,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/build/chess-debug",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
@@ -39,13 +39,13 @@
             "request": "launch",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build",
             "environment": [],
             "externalConsole": false,
-            "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/build/chess",
             "MIMode": "gdb",
             "windows": {
-              "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+              "program": "${workspaceFolder}/build/chess.exe",
               "miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
             },
             "osx": {

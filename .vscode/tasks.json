@@ -10,14 +10,14 @@
             "args": [
                 "PLATFORM=PLATFORM_DESKTOP",
                 "BUILD_MODE=DEBUG",
-                "PROJECT_NAME=${fileBasenameNoExtension}",
+                "PROJECT_NAME=chess-debug",
                 "OBJS=src/main.cpp"
             ],
             "windows": {
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
+                    "PROJECT_NAME=chess-debug",
                     "OBJS=src/main.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
@@ -25,8 +25,8 @@
             "osx": {
                 "args": [
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c",
+                    "PROJECT_NAME=chess-debug",
+                    "OBJS=main.cpp",
                     "BUILD_MODE=DEBUG"
                 ],
             },
@@ -44,22 +44,22 @@
             "command": "make",
             "args": [
                 "PLATFORM=PLATFORM_DESKTOP",
-                "PROJECT_NAME=${fileBasenameNoExtension}",
-                "OBJS=${fileBasenameNoExtension}.c"
+                "PROJECT_NAME=chess",
+                "OBJS=src/main.cpp"
             ],
             "windows": {
                 "command": "mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c"
+                    "PROJECT_NAME=chess",
+                    "OBJS=src/main.cpp"
                 ],
             },
             "osx": {
                 "args": [
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileBasenameNoExtension}.c"
+                    "PROJECT_NAME=chess",
+                    "OBJS=src/main.cpp"
                 ],
             },
             "group": "build",
