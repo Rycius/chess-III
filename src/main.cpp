@@ -1,4 +1,4 @@
-#define MY_DEBUG 0
+#define MY_DEBUG 1
 
 #include "main.h"
 #include "gui.cpp"
@@ -63,7 +63,6 @@ int main(void)
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(drawInfo.screen.width, drawInfo.screen.height, "Chess");
-
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
     drawInfo.clockFont = GetFontDefault();
@@ -81,6 +80,8 @@ int main(void)
 #ifdef MY_DEBUG
     drawInfo.piecesTex = LoadTexture("../resources/pieces.png");
 #else
+    MaximizeWindow();
+
     Image img = {
         .data = CHESSPIECESIMG_DATA,
         .width = CHESSPIECESIMG_WIDTH,
