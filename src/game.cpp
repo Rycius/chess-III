@@ -380,19 +380,24 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
 }
 
 
-internal void GameUpdate(game_info *game, draw_info *bi)
+internal void GameUpdate(game_info *game, draw_info *drawInfo)
 {
+
+    if(IsKeyPressed(KEY_R))
+    {
+        drawInfo->flipped = !drawInfo->flipped;
+    }
+    drawInfo->camera.rotation = drawInfo->flipped ? 180.0f : 0.0f;
+
     square_info *squareUnderMouse = 0;
 
     {
-        v2 boardStart = Vec2(bi->flipped ? bi->boardPos.x+bi->boardDim.x : bi->boardPos.x, bi->flipped ? bi->boardPos.y : bi->boardPos.y + bi->boardDim.y);
+        v2 boardStart = Vec2(drawInfo->flipped ? drawInfo->boardPos.x+drawInfo->boardDim.x : drawInfo->boardPos.x, drawInfo->flipped ? drawInfo->boardPos.y : drawInfo->boardPos.y + drawInfo->boardDim.y);
         v2 delta = Vector2Subtract(GetMousePosition(), boardStart);
-        int32 file = floor(abs(delta.x) / bi->squareSize);
-        int32 rank = floor(abs(delta.y) / bi->squareSize);
+        int32 file = floor(abs(delta.x) / drawInfo->squareSize);
+        int32 rank = floor(abs(delta.y) / drawInfo->squareSize);
 
         if(file >= 0 && file < 8 && rank >= 0 && rank < 8) squareUnderMouse = &game->board[rank][file];
-
-        TraceLog(LOG_INFO, "file: %d, rank: %d", file, rank);
     }
 
     game->timer[game->playersTurn] -= GetFrameTime();
@@ -490,12 +495,203 @@ internal void GameUpdate(game_info *game, draw_info *bi)
             game->draggedPiece = game->selectedPiece;
         }
     }
-
-
     
 #if MY_DEBUG
     if(IsKeyPressed(KEY_S)) game->playersTurn = game->playersTurn == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE;
-#endif
+#endif 
+}
+
+void DrawClocks(game_info *game, draw_info *drawInfo)
+{
+    DrawRectangleLinesEx(drawInfo->whiteClockRec, 2.0f, BLACK);
+    int32 whiteHours = (int32)floor(game->timer[PLAYER_WHITE]/60.0f/60.0f);
+    int32 whiteMinutes = (int32)floor(game->timer[PLAYER_WHITE]/60.0f);
+    int32 whiteSeconds = (int32)game->timer[PLAYER_WHITE] % 60;
+    const char *whiteTimeText = TextFormat("%.2d:%.2d:%.2d", whiteHours, whiteMinutes, whiteSeconds);
+    DrawTextPro(drawInfo->clockFont, whiteTimeText, drawInfo->whiteTimeTextPos, Vec2(), 0.0f, drawInfo->clockFontSize, 1.0f, BLACK);
+
+    DrawRectanglePro(drawInfo->blackClockRec, Vec2(), 0.0f, BLACK);
+    int32 blackHours = (int32)floor(game->timer[PLAYER_BLACK]/60.0f/60.0f);
+    int32 blackMinutes = (int32)floor(game->timer[PLAYER_BLACK]/60.0f);
+    int32 blackSeconds = (int32)game->timer[PLAYER_BLACK] % 60;
+    const char *blackTimeText = TextFormat("%.2d:%.2d:%.2d", blackHours, blackMinutes, blackSeconds);
+    DrawTextPro(drawInfo->clockFont, blackTimeText, drawInfo->blackTimeTextPos, Vec2(), 0.0f, drawInfo->clockFontSize, 1.0f, WHITE);
+}
+
+Rectangle RecForSquare(draw_info *drawInfo, sq_coord coord, bool center = false)
+{
+    Rectangle result = {0};
     
+    int32 offset = center ? drawInfo->squareSize/2 : 0;
+
+    result = Rec(drawInfo->boardPos.x+drawInfo->squareSize*coord.file+offset, drawInfo->boardPos.y+drawInfo->boardDim.y-drawInfo->squareSize-drawInfo->squareSize*coord.rank+offset, drawInfo->squareSize, drawInfo->squareSize);
+
+    return result;
+}
+
+internal Rectangle TexRecForPiece(piece_info piece, Texture2D tex)
+{
+    Rectangle result = {0};
+
+    result.width = tex.width / 6;
+    result.height = tex.height / 2;
+
+    result.y = (piece.owner == PLAYER_WHITE) ? tex.height / 2 : 0;
+
+    switch (piece.type)
+    {
+    case ROOK:
+    {
+        result.x = 0;    
+    } break;
+    case BISHOP:
+    {
+        result.x = result.width;    
+    } break;
+    case QUEEN:
+    {
+        result.x = result.width * 2;    
+    } break;
+    case KING:
+    {
+        result.x = result.width * 3;    
+    } break;
+    case KNIGHT:
+    {
+        result.x = result.width * 4;    
+    } break;
+    case PAWN:
+    {
+        result.x = result.width * 5;  
+    } break;
     
+    default:
+        result = Rec(0, 0, 0, 0);
+        break;
+    }
+
+    return result;
+}
+
+Rectangle _deferedRec;
+piece_info *_deferedPiece;
+
+void DrawBoard(game_info *game, draw_info *drawInfo)
+{
+    BeginMode2D(drawInfo->camera);
+
+    DrawTexturePro(drawInfo->boardTex, Rec(0, 0, drawInfo->boardTex.width, drawInfo->boardTex.height), Rec(drawInfo->boardPos, drawInfo->boardDim), Vec2(), 0.0f, WHITE);
+    DrawRectangleLinesEx(Rec(drawInfo->boardPos, drawInfo->boardDim), 1.0f, BLACK);
+
+    if(game->draggedPiece == 0) _deferedPiece = 0;
+
+    if(game->selectedPossibleMoves != 0)
+    {
+        for(int32 i = 0; i < arrlen(game->selectedPossibleMoves); ++i)
+        {
+            sq_coord sq = game->selectedPossibleMoves[i];
+            Rectangle sqRec = RecForSquare(drawInfo, sq);
+            DrawRectanglePro(sqRec, Vec2(), 0.0f, Fade(GREEN, 0.3f));
+        }
+    }
+
+    if(game->check)
+    {
+        sq_coord kingSq = game->playersTurn == PLAYER_WHITE ? game->whiteKing : game->blackKing;
+        Rectangle sqRec = RecForSquare(drawInfo, kingSq);
+        DrawRectanglePro(sqRec, Vec2(), 0.0f, Fade(RED, 0.5f));
+    }
+
+    if(game->selectedPiece != 0)
+    {
+        Rectangle sqRec = RecForSquare(drawInfo, game->selectedPiece->coord);
+        DrawRectangleLinesEx(sqRec, 2.0f, GREEN);
+    }
+
+    for(int32 r = 0; r < 8; ++r)
+    {
+        for(int32 f = 0; f < 8; ++f)
+        {
+            square_info sq = game->board[r][f]; 
+
+            if(sq.piece == 0) continue;
+
+            Rectangle pieceRec = RecForSquare(drawInfo, sq.coord, true);
+            
+            if(sq.piece->isDragged)
+            {
+                v2 mw = GetScreenToWorld2D(GetMousePosition(), drawInfo->camera);
+                pieceRec.x = mw.x;
+                pieceRec.y = mw.y;
+
+                _deferedRec = pieceRec;
+                _deferedPiece = sq.piece;
+            }
+            else
+            {
+                DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(*sq.piece, drawInfo->piecesTex), pieceRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
+            }
+        }
+    }
+
+    for(int32 p = 1; p < 3; ++p)
+    {
+        piece_info *takenPieces = game->piecesTaken[p];
+
+        if(arrlen(takenPieces) > 0)
+        {
+            int32 row = 0;
+            int32 col = 0;
+            for(int32 i = 0; i < arrlen(takenPieces); ++i)
+            {
+                int32 dir = (player_color)p == PLAYER_WHITE ? 1 : -1;
+                Rectangle pieceTexRec = TexRecForPiece(takenPieces[i], drawInfo->piecesTex);
+                Rectangle pieceBordRec = (player_color)p == PLAYER_WHITE ? RecForSquare(drawInfo, (sq_coord){0, 8}) : RecForSquare(drawInfo, (sq_coord){7, -1});
+                if((player_color)p == PLAYER_BLACK) 
+                {
+                    pieceBordRec.x += drawInfo->squareSize;
+                    pieceBordRec.y += drawInfo->squareSize;
+                }
+                pieceBordRec.width /= 3.0f;
+                pieceBordRec.height /= 3.0f;
+                pieceBordRec.x += dir * pieceBordRec.width/2.0f;
+                if(pieceBordRec.x + dir * col * pieceBordRec.width > drawInfo->screen.width || pieceBordRec.x + dir * col * pieceBordRec.width < 0) 
+                {
+                    row++;
+                    col = 0;
+                }
+                pieceBordRec.x += dir * col * pieceBordRec.width;
+                pieceBordRec.y += dir * row * pieceBordRec.height + dir * pieceBordRec.height/2.0f;
+                
+                col++;
+                DrawTexturePro(drawInfo->piecesTex, pieceTexRec, pieceBordRec, Vec2(pieceBordRec.width/2.0f, pieceBordRec.height/2.0f), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
+            }
+        }
+    }
+
+    if(_deferedPiece != 0)
+    {
+        TraceLog(LOG_INFO, "Defered piece is");
+        DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(*_deferedPiece, drawInfo->piecesTex), _deferedRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
+        _deferedPiece = 0;
+    }
+
+    EndMode2D();
+    
+    ///////////// DRAW FILE LETTERS AND RANK NUMBERS ON THE BOARD ///////////////////////
+    const char* fileLetters[] = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    v2 fStart = Vector2Add(drawInfo->boardPos, Vec2(5.0f, drawInfo->boardDim.y-drawInfo->boardFontSize));
+    int32 fIndex = 0;
+    for(int32 i = drawInfo->flipped ? 7 : 0; drawInfo->flipped ? i >= 0 : i < 8; drawInfo->flipped ? --i : ++i)
+    {
+        DrawTextPro(drawInfo->boardFont, fileLetters[i], Vec2(fStart.x + drawInfo->squareSize*fIndex++, fStart.y), Vec2(), 0.0f, drawInfo->boardFontSize, 1.0f, RED);
+    }
+
+    const char* rankNumbers[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+    v2 rStart = Vector2Add(drawInfo->boardPos, Vec2(5.0f, drawInfo->boardDim.y-drawInfo->squareSize+1));
+    int32 rlIndex = 0;
+    for(int32 i = drawInfo->flipped ? 7 : 0; drawInfo->flipped ? i >= 0 : i < 8; drawInfo->flipped ? --i : ++i)
+    {
+        DrawTextPro(drawInfo->boardFont, rankNumbers[i], Vec2(rStart.x, rStart.y-drawInfo->squareSize*rlIndex++), Vec2(), 0.0f, drawInfo->boardFontSize, 1.0f, RED);
+    }
 }

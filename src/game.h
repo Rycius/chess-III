@@ -1,11 +1,16 @@
 struct draw_info
 {
+    Texture2D boardTex;
+    Texture2D piecesTex;
     v2 boardPos;
     v2 boardDim;
     bool flipped;
 
     float squareSize;
-    int32 boardFontSize;
+
+    Font boardFont;
+    float boardFontSize;
+    float boardMinFontSize;
 
     Font clockFont;
     Rectangle whiteClockRec;
@@ -13,8 +18,10 @@ struct draw_info
     v2 whiteTimeTextPos;
     v2 blackTimeTextPos;
     float clockFontSize;
-};
 
+    Camera2D camera;
+    Rectangle screen;
+};
 
 enum player_color
 {
@@ -55,11 +62,12 @@ struct square_info
     piece_info *piece; 
 };
 
-
+enum game_state {GAME_SETUP, GAME_PLAY, GAME_END};
 
 struct game_info
 {
     square_info board[8][8];
+    game_state gameState;
     player_color playersTurn;
     piece_info *selectedPiece;
     piece_info *draggedPiece;
