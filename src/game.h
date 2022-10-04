@@ -1,12 +1,18 @@
-struct board_info
+struct draw_info
 {
-    v2 pos;
-    v2 dim;
+    v2 boardPos;
+    v2 boardDim;
+    bool flipped;
 
     float squareSize;
-    int32 fontSize;
+    int32 boardFontSize;
 
-    bool flipped;
+    Font clockFont;
+    Rectangle whiteClockRec;
+    Rectangle blackClockRec;
+    v2 whiteTimeTextPos;
+    v2 blackTimeTextPos;
+    float clockFontSize;
 };
 
 
@@ -49,6 +55,8 @@ struct square_info
     piece_info *piece; 
 };
 
+
+
 struct game_info
 {
     square_info board[8][8];
@@ -63,5 +71,5 @@ struct game_info
     player_color elPeasant;
     sq_coord elPeasantSq;
     int32 dir;
-    double playerTimer[3];
+    double timer[3];
 };

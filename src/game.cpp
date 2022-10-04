@@ -380,12 +380,12 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
 }
 
 
-internal void Update(game_info *game, board_info *bi)
+internal void GameUpdate(game_info *game, draw_info *bi)
 {
     square_info *squareUnderMouse = 0;
 
     {
-        v2 boardStart = Vec2(bi->flipped ? bi->pos.x+bi->dim.x : bi->pos.x, bi->flipped ? bi->pos.y : bi->pos.y + bi->dim.y);
+        v2 boardStart = Vec2(bi->flipped ? bi->boardPos.x+bi->boardDim.x : bi->boardPos.x, bi->flipped ? bi->boardPos.y : bi->boardPos.y + bi->boardDim.y);
         v2 delta = Vector2Subtract(GetMousePosition(), boardStart);
         int32 file = floor(abs(delta.x) / bi->squareSize);
         int32 rank = floor(abs(delta.y) / bi->squareSize);
@@ -395,6 +395,12 @@ internal void Update(game_info *game, board_info *bi)
         TraceLog(LOG_INFO, "file: %d, rank: %d", file, rank);
     }
 
+    game->timer[game->playersTurn] -= GetFrameTime();
+    if(game->timer[game->playersTurn] <= 0.0)
+    {
+        game->timer[game->playersTurn] = 0.0;
+        // GAME OVER
+    }
     game->check = KingIsChecked(game->board, game->playersTurn == PLAYER_WHITE ? game->whiteKing : game->blackKing);
     if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
     ///////////////////// PIECE SELECTION AND DRAGING ///////////////////////
