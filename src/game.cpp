@@ -671,7 +671,6 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
 
     if(_deferedPiece != 0)
     {
-        TraceLog(LOG_INFO, "Defered piece is");
         DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(*_deferedPiece, drawInfo->piecesTex), _deferedRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
         _deferedPiece = 0;
     }

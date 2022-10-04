@@ -5,6 +5,9 @@
 
 #include "game.cpp"
 
+#ifndef MY_DEBUG
+#include "chessPiecesImg.h"
+#endif
 
 internal void HandleScreenResize(Rectangle *screen, Camera2D *camera, draw_info *drawInfo)
 {
@@ -46,7 +49,7 @@ int main(void)
 {
     // Initialization
     //-------------------------------------------------------------------------------------
-
+    //ExportImageAsCode(LoadImage("../resources/pieces.png"), "../chessPiecesImg.h");
     
     //--------------------------------------------------------------------------------------
     draw_info drawInfo = {0};
@@ -59,7 +62,7 @@ int main(void)
     };
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(drawInfo.screen.width, drawInfo.screen.height, "raylib");
+    InitWindow(drawInfo.screen.width, drawInfo.screen.height, "Chess");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
@@ -73,7 +76,20 @@ int main(void)
     drawInfo.boardTex = LoadTextureFromImage(boardImage);
     UnloadImage(boardImage);
 
+    
+
+#ifdef MY_DEBUG
     drawInfo.piecesTex = LoadTexture("../resources/pieces.png");
+#else
+    Image img = {
+        .data = CHESSPIECESIMG_DATA,
+        .width = CHESSPIECESIMG_WIDTH,
+        .height = CHESSPIECESIMG_HEIGHT,
+        .mipmaps = 1,
+        .format = CHESSPIECESIMG_FORMAT,
+    };  
+    drawInfo.piecesTex = LoadTextureFromImage(img);
+#endif
 
     HandleScreenResize(&drawInfo.screen, &drawInfo.camera, &drawInfo);
 
