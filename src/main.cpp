@@ -1,25 +1,25 @@
 #define MY_DEBUG 1
 
 #include "main.h"
-#include "gui.cpp"
 
 #include "game.cpp"
+#include "gui.cpp"
 
 #ifndef MY_DEBUG
 #include "chessPiecesImg.h"
 #endif
 
-internal void HandleScreenResize(Rectangle *screen, Camera2D *camera, draw_info *drawInfo)
+internal void HandleScreenResize(draw_info *drawInfo)
 {
 #define BOARD_BORDER 10.0f
 #define CLOCK_BORDER 5.0f
-    *screen = Rec(0.0f, 0.0f, GetScreenWidth(), GetScreenHeight());
+    drawInfo->screen = Rec(0.0f, 0.0f, GetScreenWidth(), GetScreenHeight());
 
-    camera->offset = Vec2(screen->width/2.0f, screen->height/2.0f),
-    camera->target = Vec2(screen->width/2.0f, screen->height/2.0f),
+    drawInfo->camera.offset = Vec2(drawInfo->screen.width/2.0f, drawInfo->screen.height/2.0f),
+    drawInfo->camera.target = Vec2(drawInfo->screen.width/2.0f, drawInfo->screen.height/2.0f),
 
-    drawInfo->boardDim = Vec2(screen->height-BOARD_BORDER*2, screen->height-BOARD_BORDER*2);
-    drawInfo->boardPos = Vec2((screen->width - drawInfo->boardDim.x)/2.0f, (screen->height - drawInfo->boardDim.y)/2.0f);
+    drawInfo->boardDim = Vec2(drawInfo->screen.height-BOARD_BORDER*2, drawInfo->screen.height-BOARD_BORDER*2);
+    drawInfo->boardPos = Vec2((drawInfo->screen.width - drawInfo->boardDim.x)/2.0f, (drawInfo->screen.height - drawInfo->boardDim.y)/2.0f);
     drawInfo->squareSize = drawInfo->boardDim.x/8;
 
     drawInfo->boardFontSize = drawInfo->squareSize / 10.f;
@@ -35,7 +35,7 @@ internal void HandleScreenResize(Rectangle *screen, Camera2D *camera, draw_info 
 
     drawInfo->whiteClockRec.x = (drawInfo->boardPos.x - drawInfo->blackClockRec.width) / 2.0f - CLOCK_BORDER;
     drawInfo->whiteClockRec.y = (drawInfo->boardPos.y + drawInfo->boardDim.y) / 2.0f - drawInfo->whiteClockRec.height / 2.0f - CLOCK_BORDER;
-    drawInfo->blackClockRec.x = drawInfo->boardPos.x + drawInfo->boardDim.x + (screen->width - drawInfo->boardPos.x - drawInfo->boardDim.x - drawInfo->blackClockRec.width) / 2.0f - CLOCK_BORDER;
+    drawInfo->blackClockRec.x = drawInfo->boardPos.x + drawInfo->boardDim.x + (drawInfo->screen.width - drawInfo->boardPos.x - drawInfo->boardDim.x - drawInfo->blackClockRec.width) / 2.0f - CLOCK_BORDER;
     drawInfo->blackClockRec.y = (drawInfo->boardPos.y + drawInfo->boardDim.y) / 2.0f - drawInfo->blackClockRec.height / 2.0f - CLOCK_BORDER;
 
     drawInfo->whiteTimeTextPos = Vector2AddValue(Vec2(drawInfo->whiteClockRec.x, drawInfo->whiteClockRec.y), CLOCK_BORDER);
@@ -43,6 +43,34 @@ internal void HandleScreenResize(Rectangle *screen, Camera2D *camera, draw_info 
 
 #undef BOARD_BORDER
 #undef CLOCK_BORDER
+
+    float buttonsAreaW = drawInfo->screen.width * 0.7f;
+    float buttonsAreaH = drawInfo->screen.height * 0.4f;
+    float buttonsAreaX = (drawInfo->screen.width - buttonsAreaW) / 2.0f;
+    float buttonsAreaY = (drawInfo->screen.height - buttonsAreaH) / 2.0f;
+
+    float buttonX = buttonsAreaX;
+    float buttonY = buttonsAreaY;
+    float buttonW = (buttonsAreaW / drawInfo->guiButtonsCountHor) - ((drawInfo->guiButtonsCountHor - 1) * drawInfo->guiSpacing);
+    int32 verCount = (arrlen(_buttons) / drawInfo->guiButtonsCountHor);
+    float buttonH = (buttonsAreaH / verCount) - ((verCount - 1) * drawInfo->guiSpacing);
+
+    for(int32 i = 0; i < arrlen(_buttons); ++i)
+    {
+        drawInfo->guiTextFontSize = buttonH / 2.0f;
+
+        _buttons[i].rec = Rec(buttonX, buttonY, buttonW, buttonH);
+
+        v2 textDim = MeasureTextEx(drawInfo->guiTextFont, _buttons[i].text, drawInfo->guiTextFontSize, 1.0f);
+        _buttons[i].textPos = Vec2(buttonX + (buttonW - textDim.x) / 2.0f, buttonY + (buttonH - textDim.y) / 2.0f);
+
+        buttonX += drawInfo->guiSpacing + buttonW;
+        if(((i + 1) % drawInfo->guiButtonsCountHor) == 0)
+        {
+            buttonX = buttonsAreaX;
+            buttonY += drawInfo->guiSpacing + buttonH;
+        }
+    }
 }
 
 int main(void) 
@@ -75,7 +103,9 @@ int main(void)
     drawInfo.boardTex = LoadTextureFromImage(boardImage);
     UnloadImage(boardImage);
 
-    
+    drawInfo.guiTextFont = GetFontDefault();
+    drawInfo.guiButtonsCountHor = 4;
+    drawInfo.guiSpacing = 5;
 
 #ifdef MY_DEBUG
     drawInfo.piecesTex = LoadTexture("../resources/pieces.png");
@@ -92,16 +122,18 @@ int main(void)
     drawInfo.piecesTex = LoadTextureFromImage(img);
 #endif
 
-    HandleScreenResize(&drawInfo.screen, &drawInfo.camera, &drawInfo);
 
     game_info game = {0};
     game.playersTurn = PLAYER_WHITE;
     game.dir = 1;
     game.timer[PLAYER_WHITE] = 90.0;
     game.timer[PLAYER_BLACK] = 10.0;
-    game.gameState = GAME_PLAY;
+    game.state = GAME_SETUP;
+
+    GUISetup(&game, &drawInfo);
     SetupBoard(&game);
 
+    HandleScreenResize(&drawInfo);
     
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -110,15 +142,15 @@ int main(void)
         //----------------------------------------------------------------------------------
         if(IsWindowResized())
         {
-            HandleScreenResize(&drawInfo.screen, &drawInfo.camera, &drawInfo);
+            HandleScreenResize(&drawInfo);
         }
 
 
-        switch(game.gameState)
+        switch(game.state)
         {
             case GAME_SETUP:
             {
-
+                GUIUpdate(&game);
             } break;
 
             case GAME_PLAY:
@@ -139,11 +171,11 @@ int main(void)
         
         ClearBackground(RAYWHITE);
 
-        switch(game.gameState)
+        switch(game.state)
         {
             case GAME_SETUP:
             {
-
+                DrawGUI(&drawInfo);
             } break;
 
             case GAME_PLAY:
@@ -159,7 +191,7 @@ int main(void)
             } break;
         }
 
-        DrawFPS(10, 10);
+        //DrawFPS(10, 10);
         EndDrawing();
         //----------------------------------------------------------------------------------
     }

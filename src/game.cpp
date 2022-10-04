@@ -460,6 +460,7 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
 
                 game->draggedPiece = 0;
                 game->selectedPiece = 0;
+                game->timer[game->playersTurn] += game->timeControl.increment;
                 game->playersTurn = game->playersTurn == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE;
                 //bi->flipped = game->playersTurn == PLAYER_WHITE ? false : true;
                 game->dir *= -1;
