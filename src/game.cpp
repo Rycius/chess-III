@@ -357,7 +357,7 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
     }
     else
     {
-        piece_type proms[4] = {QUEEN, ROOK, BISHOP, KNIGHT};
+        piece_type proms[4] = {QUEEN, ROOK, BISHOP, KNIGHT}; 
 
         if(IsMouseButtonPressed(0))
         {
