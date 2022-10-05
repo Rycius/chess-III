@@ -70,7 +70,7 @@ struct move_patern
 };
 
 
-enum game_state {GAME_SETUP = 0, GAME_PROMOTING, GAME_PLAY, GAME_END};
+enum game_state {GAME_SETUP = 0, GAME_PLAY, GAME_END};
 
 struct game_time_control
 {

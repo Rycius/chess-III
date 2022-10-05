@@ -328,7 +328,7 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         int32 file = floor(abs(delta.x) / drawInfo->squareSize);
         int32 rank = floor(abs(delta.y) / drawInfo->squareSize);
 
-        if(file >= 0 && file < 8 && rank >= 0 && rank < 8) squareUnderMouse = Coord(rank, file);
+        if(CoordIsValid(Coord(rank, file))) squareUnderMouse = Coord(rank, file);
         else squareUnderMouse = Coord(-1, 0);
     }
 
