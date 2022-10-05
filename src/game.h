@@ -54,9 +54,9 @@ struct sq_coord
 
 struct piece_info
 {
+    sq_coord coord;
     player_color owner;
     piece_type type;
-    sq_coord coord;
     bool isDragged;
     bool hasMoved;
 };
@@ -93,4 +93,16 @@ struct game_info
     int32 dir;
     game_time_control timeControl;
     double timer[3];
+    bool playerMoved[3];
+
 };
+
+sq_coord Coord(int32 rank, int32 file)
+{
+    return (sq_coord){ rank, file };
+}
+
+sq_coord CoordAdd(sq_coord a, sq_coord b)
+{
+    return (sq_coord){ a.rank + b.rank, a.file + b.file };
+}

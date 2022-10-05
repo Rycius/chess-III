@@ -21,36 +21,36 @@ internal void SetupBoard(game_info *game)
         }
     }
 
-    *game->board[0][0].piece = (piece_info){.owner = PLAYER_WHITE, .type = ROOK, .coord = (sq_coord){0, 0}};
-    *game->board[0][1].piece = (piece_info){.owner = PLAYER_WHITE, .type = KNIGHT, .coord = (sq_coord){0, 1}};
-    *game->board[0][2].piece = (piece_info){.owner = PLAYER_WHITE, .type = BISHOP, .coord = (sq_coord){0, 2}};
-    *game->board[0][3].piece = (piece_info){.owner = PLAYER_WHITE, .type = QUEEN, .coord = (sq_coord){0, 3}};
-    *game->board[0][4].piece = (piece_info){.owner = PLAYER_WHITE, .type = KING, .coord = (sq_coord){0, 4}};
-    *game->board[0][5].piece = (piece_info){.owner = PLAYER_WHITE, .type = BISHOP, .coord = (sq_coord){0, 5}};
-    *game->board[0][6].piece = (piece_info){.owner = PLAYER_WHITE, .type = KNIGHT, .coord = (sq_coord){0, 6}};
-    *game->board[0][7].piece = (piece_info){.owner = PLAYER_WHITE, .type = ROOK, .coord = (sq_coord){0, 7}};
+    *game->board[0][0].piece = (piece_info){.coord = (sq_coord){0, 0}, .owner = PLAYER_WHITE, .type = ROOK,  };
+    *game->board[0][1].piece = (piece_info){.coord = (sq_coord){0, 1}, .owner = PLAYER_WHITE, .type = KNIGHT,};
+    *game->board[0][2].piece = (piece_info){.coord = (sq_coord){0, 2}, .owner = PLAYER_WHITE, .type = BISHOP,};
+    *game->board[0][3].piece = (piece_info){.coord = (sq_coord){0, 3}, .owner = PLAYER_WHITE, .type = QUEEN, };
+    *game->board[0][4].piece = (piece_info){.coord = (sq_coord){0, 4}, .owner = PLAYER_WHITE, .type = KING,  };
+    *game->board[0][5].piece = (piece_info){.coord = (sq_coord){0, 5}, .owner = PLAYER_WHITE, .type = BISHOP,};
+    *game->board[0][6].piece = (piece_info){.coord = (sq_coord){0, 6}, .owner = PLAYER_WHITE, .type = KNIGHT,};
+    *game->board[0][7].piece = (piece_info){.coord = (sq_coord){0, 7}, .owner = PLAYER_WHITE, .type = ROOK,  };
 
     game->whiteKing = (sq_coord){0, 4};
 
     for(int32 f = 0; f < 8; ++f)
     {
-        *game->board[1][f].piece = (piece_info){.owner = PLAYER_WHITE, .type = PAWN, .coord = (sq_coord){1, f}};
+        *game->board[1][f].piece = (piece_info){.coord = (sq_coord){1, f}, .owner = PLAYER_WHITE, .type = PAWN,};
     }
 
-    *game->board[7][0].piece = (piece_info){.owner = PLAYER_BLACK, .type = ROOK, .coord = (sq_coord){7, 0}};
-    *game->board[7][1].piece = (piece_info){.owner = PLAYER_BLACK, .type = KNIGHT, .coord = (sq_coord){7, 1}};
-    *game->board[7][2].piece = (piece_info){.owner = PLAYER_BLACK, .type = BISHOP, .coord = (sq_coord){7, 2}};
-    *game->board[7][3].piece = (piece_info){.owner = PLAYER_BLACK, .type = QUEEN, .coord = (sq_coord){7, 3}};
-    *game->board[7][4].piece = (piece_info){.owner = PLAYER_BLACK, .type = KING, .coord = (sq_coord){7, 4}};
-    *game->board[7][5].piece = (piece_info){.owner = PLAYER_BLACK, .type = BISHOP, .coord = (sq_coord){7, 5}};
-    *game->board[7][6].piece = (piece_info){.owner = PLAYER_BLACK, .type = KNIGHT, .coord = (sq_coord){7, 6}};
-    *game->board[7][7].piece = (piece_info){.owner = PLAYER_BLACK, .type = ROOK, .coord = (sq_coord){7, 7}};
+    *game->board[7][0].piece = (piece_info){.coord = (sq_coord){7, 0}, .owner = PLAYER_BLACK, .type = ROOK,   };
+    *game->board[7][1].piece = (piece_info){.coord = (sq_coord){7, 1}, .owner = PLAYER_BLACK, .type = KNIGHT, };
+    *game->board[7][2].piece = (piece_info){.coord = (sq_coord){7, 2}, .owner = PLAYER_BLACK, .type = BISHOP, };
+    *game->board[7][3].piece = (piece_info){.coord = (sq_coord){7, 3}, .owner = PLAYER_BLACK, .type = QUEEN,  };
+    *game->board[7][4].piece = (piece_info){.coord = (sq_coord){7, 4}, .owner = PLAYER_BLACK, .type = KING,   };
+    *game->board[7][5].piece = (piece_info){.coord = (sq_coord){7, 5}, .owner = PLAYER_BLACK, .type = BISHOP, };
+    *game->board[7][6].piece = (piece_info){.coord = (sq_coord){7, 6}, .owner = PLAYER_BLACK, .type = KNIGHT, };
+    *game->board[7][7].piece = (piece_info){.coord = (sq_coord){7, 7}, .owner = PLAYER_BLACK, .type = ROOK,   };
 
     game->blackKing = (sq_coord){7, 4};
 
     for(int32 f = 0; f < 8; ++f)
     {
-        *game->board[6][f].piece = (piece_info){.owner = PLAYER_BLACK, .type = PAWN, .coord = (sq_coord){6, f}};
+        *game->board[6][f].piece = (piece_info){.coord = (sq_coord){6, f}, .owner = PLAYER_BLACK, .type = PAWN,};
     }
 
     sq_coord qp[8] = {(sq_coord){1, 0}, (sq_coord){-1, 0}, (sq_coord){0, 1}, (sq_coord){0, -1}, (sq_coord){1, -1}, (sq_coord){1, 1}, (sq_coord){-1, -1}, (sq_coord){-1, 1}};
@@ -105,6 +105,7 @@ internal inline bool CoordIsValid(sq_coord coord)
     return (coord.file >= 0 && coord.file < 8 && coord.rank >= 0 && coord.rank < 8);
 }
 
+
 internal bool KingIsChecked(square_info board[8][8], sq_coord kingCoord)
 {
     Assert(board[kingCoord.rank][kingCoord.file].piece->type == KING);
@@ -115,6 +116,7 @@ internal bool KingIsChecked(square_info board[8][8], sq_coord kingCoord)
     player_color kingColor = board[kingCoord.rank][kingCoord.file].piece->owner;
     int32 dir = kingColor == PLAYER_WHITE ? 1 : -1;
     sq_coord *patern = queenPatern;
+
 
     sq_coord pawns[2] = {(sq_coord){kingCoord.rank+1*dir, kingCoord.file-1}, (sq_coord){kingCoord.rank+1*dir, kingCoord.file+1}};
     for(int32 i = 0; i < 2; ++i)
@@ -129,6 +131,7 @@ internal bool KingIsChecked(square_info board[8][8], sq_coord kingCoord)
             }
         }
     }
+
 
     for(int32 i = 0; i < arrlen(patern); ++i)
     {
@@ -221,6 +224,9 @@ internal bool KingIsChecked(square_info board[8][8], sq_coord kingCoord)
     return result;
 }
 
+
+
+
 internal bool MoveIsLegal(game_info *game, sq_coord from, sq_coord to)
 {
     Assert(game->board[from.rank][from.file].piece != 0);
@@ -235,7 +241,6 @@ internal bool MoveIsLegal(game_info *game, sq_coord from, sq_coord to)
 
     board[to.rank][to.file].piece = board[from.rank][from.file].piece;
     board[from.rank][from.file].piece = 0;
-
 
     result = !KingIsChecked(board, kingsCoord);
 
@@ -400,12 +405,16 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         if(file >= 0 && file < 8 && rank >= 0 && rank < 8) squareUnderMouse = &game->board[rank][file];
     }
 
-    game->timer[game->playersTurn] -= GetFrameTime();
-    if(game->timer[game->playersTurn] <= 0.0)
+    if(game->playerMoved[game->playersTurn])
     {
-        game->timer[game->playersTurn] = 0.0;
-        // GAME OVER
+        game->timer[game->playersTurn] -= GetFrameTime();
+        if(game->timer[game->playersTurn] <= 0.0)
+        {
+            game->timer[game->playersTurn] = 0.0;
+            game->state = GAME_END;
+        }
     }
+    
     game->check = KingIsChecked(game->board, game->playersTurn == PLAYER_WHITE ? game->whiteKing : game->blackKing);
     if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
     ///////////////////// PIECE SELECTION AND DRAGING ///////////////////////
@@ -460,7 +469,8 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
 
                 game->draggedPiece = 0;
                 game->selectedPiece = 0;
-                game->timer[game->playersTurn] += game->timeControl.increment;
+                if(game->playerMoved[game->playersTurn]) game->timer[game->playersTurn] += game->timeControl.increment;
+                game->playerMoved[game->playersTurn] = true;
                 game->playersTurn = game->playersTurn == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE;
                 //bi->flipped = game->playersTurn == PLAYER_WHITE ? false : true;
                 game->dir *= -1;
