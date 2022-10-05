@@ -122,13 +122,72 @@ int main(void)
     drawInfo.piecesTex = LoadTextureFromImage(img);
 #endif
 
+    sq_coord *kingPos = (sq_coord *)calloc(3, sizeof(sq_coord));
+    piece_info *piecesTaken[3] = {0};
+    double *timer = (double *)calloc(3, sizeof(double));
+    bool *playerMoved = (bool *)calloc(3, sizeof(bool));
 
     game_info game = {0};
+    game.kingPos = kingPos + 1;
+    game.piecesTaken = piecesTaken + 1;
+    game.timer = timer + 1;
+    game.playerMoved = playerMoved + 1;
     game.playersTurn = PLAYER_WHITE;
     game.dir = 1;
     game.timer[PLAYER_WHITE] = 90.0;
     game.timer[PLAYER_BLACK] = 10.0;
     game.state = GAME_SETUP;
+
+    move_patern pawnMP = {0};
+    pawnMP.type = PATERN_SINGLE;
+    arrpush(pawnMP.moves, Coord(1, 1));
+    arrpush(pawnMP.moves, Coord(1, -1));
+    game.movePaterns[PAWN] = pawnMP;
+
+    move_patern rookMP = {0};
+    rookMP.type = PATERN_CONTINUES;
+    arrpush(rookMP.moves, Coord(1, 0));
+    arrpush(rookMP.moves, Coord(-1, 0));
+    arrpush(rookMP.moves, Coord(0, 1));
+    arrpush(rookMP.moves, Coord(0, -1));
+    game.movePaterns[ROOK] = rookMP;
+
+    move_patern bishopMP = {0};
+    bishopMP.type = PATERN_CONTINUES;
+    arrpush(bishopMP.moves, Coord(1, -1));
+    arrpush(bishopMP.moves, Coord(1, 1));
+    arrpush(bishopMP.moves, Coord(-1, -1));
+    arrpush(bishopMP.moves, Coord(-1, 1));
+    game.movePaterns[BISHOP] = bishopMP;
+
+    move_patern queenMP = {0};
+    queenMP.type = PATERN_CONTINUES;
+    arrpush(queenMP.moves, Coord(1, 0));
+    arrpush(queenMP.moves, Coord(-1, 0));
+    arrpush(queenMP.moves, Coord(0, 1));
+    arrpush(queenMP.moves, Coord(0, -1));
+    arrpush(queenMP.moves, Coord(1, -1));
+    arrpush(queenMP.moves, Coord(1, 1));
+    arrpush(queenMP.moves, Coord(-1, -1));
+    arrpush(queenMP.moves, Coord(-1, 1));
+    game.movePaterns[QUEEN] = queenMP;
+
+    move_patern knightMP = {0};
+    knightMP.type = PATERN_SINGLE;
+    arrpush(knightMP.moves, Coord(2, -1));
+    arrpush(knightMP.moves, Coord(2, 1));
+    arrpush(knightMP.moves, Coord(-2, -1));
+    arrpush(knightMP.moves, Coord(-2, 1));
+    arrpush(knightMP.moves, Coord(1, 2));
+    arrpush(knightMP.moves, Coord(-1, 2));
+    arrpush(knightMP.moves, Coord(1, -2));
+    arrpush(knightMP.moves, Coord(-1, -2));
+    game.movePaterns[KNIGHT] = knightMP;
+
+    move_patern kingMP = {0};
+    kingMP.type = PATERN_SINGLE;
+    kingMP.moves = queenMP.moves;
+    game.movePaterns[KING] = kingMP;
 
     GUISetup(&game, &drawInfo);
     SetupBoard(&game);
@@ -182,7 +241,6 @@ int main(void)
             {
                 DrawClocks(&game, &drawInfo);
                 DrawBoard(&game, &drawInfo);
-                
             } break;
 
             case GAME_END:

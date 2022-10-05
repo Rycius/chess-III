@@ -1,82 +1,47 @@
 #include "game.h"
 
-sq_coord *queenPatern = 0;
-sq_coord *rookPatern = 0;
-sq_coord *bishopPatern = 0;
-sq_coord *knightPatern = 0;
-
-
-
 internal void SetupBoard(game_info *game)
 {
     for(int32 r = 0; r < 8; ++r)
     {
         for(int32 f = 0; f < 8; ++f)
         {
-            game->board[r][f].coord.file = f;
-            game->board[r][f].coord.rank = r; 
-
             if(r == 0 || r == 1 || r == 6 || r == 7)
-                game->board[r][f].piece = (piece_info *)calloc(1, sizeof(piece_info));
+                game->board[r][f] = (piece_info *)calloc(1, sizeof(piece_info));
         }
     }
 
-    *game->board[0][0].piece = (piece_info){.coord = (sq_coord){0, 0}, .owner = PLAYER_WHITE, .type = ROOK,  };
-    *game->board[0][1].piece = (piece_info){.coord = (sq_coord){0, 1}, .owner = PLAYER_WHITE, .type = KNIGHT,};
-    *game->board[0][2].piece = (piece_info){.coord = (sq_coord){0, 2}, .owner = PLAYER_WHITE, .type = BISHOP,};
-    *game->board[0][3].piece = (piece_info){.coord = (sq_coord){0, 3}, .owner = PLAYER_WHITE, .type = QUEEN, };
-    *game->board[0][4].piece = (piece_info){.coord = (sq_coord){0, 4}, .owner = PLAYER_WHITE, .type = KING,  };
-    *game->board[0][5].piece = (piece_info){.coord = (sq_coord){0, 5}, .owner = PLAYER_WHITE, .type = BISHOP,};
-    *game->board[0][6].piece = (piece_info){.coord = (sq_coord){0, 6}, .owner = PLAYER_WHITE, .type = KNIGHT,};
-    *game->board[0][7].piece = (piece_info){.coord = (sq_coord){0, 7}, .owner = PLAYER_WHITE, .type = ROOK,  };
+    *game->board[0][0] = (piece_info){.coord = Coord(0, 0), .owner = PLAYER_WHITE, .type = ROOK,  };
+    *game->board[0][1] = (piece_info){.coord = Coord(0, 1), .owner = PLAYER_WHITE, .type = KNIGHT,};
+    *game->board[0][2] = (piece_info){.coord = Coord(0, 2), .owner = PLAYER_WHITE, .type = BISHOP,};
+    *game->board[0][3] = (piece_info){.coord = Coord(0, 3), .owner = PLAYER_WHITE, .type = QUEEN, };
+    *game->board[0][4] = (piece_info){.coord = Coord(0, 4), .owner = PLAYER_WHITE, .type = KING,  };
+    *game->board[0][5] = (piece_info){.coord = Coord(0, 5), .owner = PLAYER_WHITE, .type = BISHOP,};
+    *game->board[0][6] = (piece_info){.coord = Coord(0, 6), .owner = PLAYER_WHITE, .type = KNIGHT,};
+    *game->board[0][7] = (piece_info){.coord = Coord(0, 7), .owner = PLAYER_WHITE, .type = ROOK,  };
 
-    game->whiteKing = (sq_coord){0, 4};
-
-    for(int32 f = 0; f < 8; ++f)
-    {
-        *game->board[1][f].piece = (piece_info){.coord = (sq_coord){1, f}, .owner = PLAYER_WHITE, .type = PAWN,};
-    }
-
-    *game->board[7][0].piece = (piece_info){.coord = (sq_coord){7, 0}, .owner = PLAYER_BLACK, .type = ROOK,   };
-    *game->board[7][1].piece = (piece_info){.coord = (sq_coord){7, 1}, .owner = PLAYER_BLACK, .type = KNIGHT, };
-    *game->board[7][2].piece = (piece_info){.coord = (sq_coord){7, 2}, .owner = PLAYER_BLACK, .type = BISHOP, };
-    *game->board[7][3].piece = (piece_info){.coord = (sq_coord){7, 3}, .owner = PLAYER_BLACK, .type = QUEEN,  };
-    *game->board[7][4].piece = (piece_info){.coord = (sq_coord){7, 4}, .owner = PLAYER_BLACK, .type = KING,   };
-    *game->board[7][5].piece = (piece_info){.coord = (sq_coord){7, 5}, .owner = PLAYER_BLACK, .type = BISHOP, };
-    *game->board[7][6].piece = (piece_info){.coord = (sq_coord){7, 6}, .owner = PLAYER_BLACK, .type = KNIGHT, };
-    *game->board[7][7].piece = (piece_info){.coord = (sq_coord){7, 7}, .owner = PLAYER_BLACK, .type = ROOK,   };
-
-    game->blackKing = (sq_coord){7, 4};
+    game->kingPos[PLAYER_WHITE] = (sq_coord){0, 4};
 
     for(int32 f = 0; f < 8; ++f)
     {
-        *game->board[6][f].piece = (piece_info){.coord = (sq_coord){6, f}, .owner = PLAYER_BLACK, .type = PAWN,};
+        *game->board[1][f] = (piece_info){.coord = (sq_coord){1, f}, .owner = PLAYER_WHITE, .type = PAWN,};
     }
 
-    sq_coord qp[8] = {(sq_coord){1, 0}, (sq_coord){-1, 0}, (sq_coord){0, 1}, (sq_coord){0, -1}, (sq_coord){1, -1}, (sq_coord){1, 1}, (sq_coord){-1, -1}, (sq_coord){-1, 1}};
-    for(int32 i = 0; i < ArrayCount(qp); ++i)
+    *game->board[7][0] = (piece_info){.coord = Coord(7, 0), .owner = PLAYER_BLACK, .type = ROOK,   };
+    *game->board[7][1] = (piece_info){.coord = Coord(7, 1), .owner = PLAYER_BLACK, .type = KNIGHT, };
+    *game->board[7][2] = (piece_info){.coord = Coord(7, 2), .owner = PLAYER_BLACK, .type = BISHOP, };
+    *game->board[7][3] = (piece_info){.coord = Coord(7, 3), .owner = PLAYER_BLACK, .type = QUEEN,  };
+    *game->board[7][4] = (piece_info){.coord = Coord(7, 4), .owner = PLAYER_BLACK, .type = KING,   };
+    *game->board[7][5] = (piece_info){.coord = Coord(7, 5), .owner = PLAYER_BLACK, .type = BISHOP, };
+    *game->board[7][6] = (piece_info){.coord = Coord(7, 6), .owner = PLAYER_BLACK, .type = KNIGHT, };
+    *game->board[7][7] = (piece_info){.coord = Coord(7, 7), .owner = PLAYER_BLACK, .type = ROOK,   };
+
+    game->kingPos[PLAYER_BLACK] = Coord(7, 4);
+
+    for(int32 f = 0; f < 8; ++f)
     {
-        arrpush(queenPatern, qp[i]);
+        *game->board[6][f] = (piece_info){.coord = (sq_coord){6, f}, .owner = PLAYER_BLACK, .type = PAWN,};
     }
-
-    sq_coord rp[4] = {(sq_coord){1, 0}, (sq_coord){-1, 0}, (sq_coord){0, 1}, (sq_coord){0, -1}};
-    for(int32 i = 0; i < ArrayCount(rp); ++i)
-    {
-        arrpush(rookPatern, rp[i]);
-    }
-
-    sq_coord bp[4] = {(sq_coord){1, -1}, (sq_coord){1, 1}, (sq_coord){-1, -1}, (sq_coord){-1, 1}};
-    for(int32 i = 0; i < ArrayCount(bp); ++i)
-    {
-        arrpush(bishopPatern, bp[i]);
-    }
-
-    sq_coord knp[8] = {(sq_coord){2, -1}, (sq_coord){2, 1}, (sq_coord){-2, -1}, (sq_coord){-2, 1}, (sq_coord){1, 2}, (sq_coord){-1, 2}, (sq_coord){1, -2}, (sq_coord){-1, -2}};
-    for(int32 i = 0; i < ArrayCount(knp); ++i)
-    {
-        arrpush(knightPatern, knp[i]);
-    }
-
 }
 
 internal bool CoordEqual(sq_coord a, sq_coord b)
@@ -105,146 +70,82 @@ internal inline bool CoordIsValid(sq_coord coord)
     return (coord.file >= 0 && coord.file < 8 && coord.rank >= 0 && coord.rank < 8);
 }
 
-
-internal bool KingIsChecked(square_info board[8][8], sq_coord kingCoord)
+internal bool PieceInSightOf(game_info *game, sq_coord target, piece_type *types, player_color typesColor, sq_coord changeFrom, sq_coord changeTo)
 {
-    Assert(board[kingCoord.rank][kingCoord.file].piece->type == KING);
-
-    bool result = false;
-
-
-    player_color kingColor = board[kingCoord.rank][kingCoord.file].piece->owner;
-    int32 dir = kingColor == PLAYER_WHITE ? 1 : -1;
-    sq_coord *patern = queenPatern;
-
-
-    sq_coord pawns[2] = {(sq_coord){kingCoord.rank+1*dir, kingCoord.file-1}, (sq_coord){kingCoord.rank+1*dir, kingCoord.file+1}};
-    for(int32 i = 0; i < 2; ++i)
+    for(int32 i = 0; i < arrlen(types); ++i)
     {
-        if(CoordIsValid(pawns[i]))
+        move_patern patern = game->movePaterns[types[i]];
+        for(int32 k = 0; k < arrlen(patern.moves); ++k)
         {
-            piece_info *piece = board[pawns[i].rank][pawns[i].file].piece;
-            if(piece != 0 && piece->type == PAWN && piece->owner != kingColor)
+            sq_coord pc = patern.moves[k];
+            if(types[i] == PAWN) pc.rank *= (int32)typesColor*-1;
+            sq_coord coord = CoordAdd(target, pc);
+
+            piece_info piece = {0};
+
+            while(CoordIsValid(coord))
             {
-                result = true;
-                goto END;
-            }
-        }
-    }
+                if(game->board[coord.rank][coord.file] != 0)
+                    piece = *game->board[coord.rank][coord.file];
+                else
+                    piece = {0};
 
-
-    for(int32 i = 0; i < arrlen(patern); ++i)
-    {
-        sq_coord coord = (sq_coord){kingCoord.rank+patern[i].rank, kingCoord.file+patern[i].file};
-        if(CoordIsValid(coord) == false) continue;
-
-        piece_info *piece = board[coord.rank][coord.file].piece;
-        if(piece == 0) continue;
-
-        if(piece->type == KING)
-        {
-            result = true;
-            goto END;
-        }
-    }
-
-    patern = bishopPatern;
-    for(int32 i = 0; i < arrlen(patern); ++i)
-    {
-        int32 sqCount = 1;
-        sq_coord coord = (sq_coord){kingCoord.rank+patern[i].rank*sqCount, kingCoord.file+patern[i].file*sqCount};
-
-        while(CoordIsValid(coord))
-        {
-            piece_info *piece = board[coord.rank][coord.file].piece;
-            if(piece != 0)
-            {
-                if(piece->owner != kingColor)
+                if(CoordEqual(coord, changeFrom))
                 {
-                    if(piece->type == BISHOP || piece->type == QUEEN)
-                    {
-                        result = true;
-                        goto END;
-                    }
-                    else break;
+                    piece = {0};
                 }
-                else break;
-            }
-
-            sqCount++;
-            coord = (sq_coord){kingCoord.rank+patern[i].rank*sqCount, kingCoord.file+patern[i].file*sqCount};
-        }
-    }
-
-    patern = rookPatern;
-    for(int32 i = 0; i < arrlen(patern); ++i)
-    {
-        int32 sqCount = 1;
-        sq_coord coord = (sq_coord){kingCoord.rank+patern[i].rank*sqCount, kingCoord.file+patern[i].file*sqCount};
-
-        while(CoordIsValid(coord))
-        {
-            piece_info *piece = board[coord.rank][coord.file].piece;
-            if(piece != 0)
-            {
-                if(piece->owner != kingColor)
+                else if(CoordEqual(coord, changeTo))
                 {
-                    if(piece->type == ROOK || piece->type == QUEEN)
-                    {
-                        result = true;
-                        goto END;
-                    }
-                    else break;
+                    piece = *game->board[changeFrom.rank][changeFrom.file];
                 }
-                else break;
+
+                if(piece.owner == PLAYER_NONE)
+                {
+                    if(patern.type == PATERN_SINGLE) break;
+                    coord = CoordAdd(coord, pc);
+                }
+                else if(piece.owner == typesColor*-1) break;
+                else
+                {
+                    if(types[i] == piece.type) return true;
+
+                    break;
+                }
             }
-
-            sqCount++;
-            coord = (sq_coord){kingCoord.rank+patern[i].rank*sqCount, kingCoord.file+patern[i].file*sqCount};
         }
     }
 
-    patern = knightPatern;
-    for(int32 i = 0; i < arrlen(patern); ++i)
-    {
-        sq_coord coord = (sq_coord){kingCoord.rank+patern[i].rank, kingCoord.file+patern[i].file};
-        if(CoordIsValid(coord) == false) continue;
-
-        piece_info *piece = board[coord.rank][coord.file].piece;
-        if(piece == 0) continue;
-
-        if(piece->type == KNIGHT && piece->owner != kingColor)
-        {
-            result = true;
-            goto END;
-        }
-    }
-
-    END:
-    return result;
+    return false;
 }
-
-
-
 
 internal bool MoveIsLegal(game_info *game, sq_coord from, sq_coord to)
 {
-    Assert(game->board[from.rank][from.file].piece != 0);
+    Assert(game->board[from.rank][from.file] != 0);
 
-    bool result = false;
+    piece_type *types = 0;
 
-    square_info board[8][8] = {0};
-    memcpy(board, game->board, sizeof(game->board));
+    sq_coord kingPos = game->kingPos[game->playersTurn];
+    if(CoordEqual(kingPos, from)) kingPos = to;
+    
+    arrpush(types, BISHOP);
+    arrpush(types, QUEEN);
+    bool bishopCheck = PieceInSightOf(game, kingPos, types, (player_color)(game->playersTurn*-1), from, to);
+    arrfree(types);
+    
+    arrpush(types, ROOK);
+    arrpush(types, QUEEN);
+    bool rookCheck = PieceInSightOf(game, kingPos, types, (player_color)(game->playersTurn*-1), from, to);
+    arrfree(types);
 
-    sq_coord kingsCoord = board[from.rank][from.file].piece->owner == PLAYER_WHITE ? game->whiteKing : game->blackKing;
-    if(board[from.rank][from.file].piece->type == KING) kingsCoord = board[to.rank][to.file].coord;
+    arrpush(types, KNIGHT);
+    bool knightCheck = PieceInSightOf(game, kingPos, types, (player_color)(game->playersTurn*-1), from, to);
+    arrfree(types);
 
-    board[to.rank][to.file].piece = board[from.rank][from.file].piece;
-    board[from.rank][from.file].piece = 0;
+    arrpush(types, PAWN);
+    bool pawnCheck = PieceInSightOf(game, kingPos, types, (player_color)(game->playersTurn*-1), from, to);
+    arrfree(types);
 
-    result = !KingIsChecked(board, kingsCoord);
-
-    return result;
+    return (!bishopCheck && !rookCheck && !knightCheck && !pawnCheck);
 }
 
 internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
@@ -259,20 +160,20 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
         {
             //////// MOVING
             sq_coord one = (sq_coord){piece->coord.rank+1*game->dir, piece->coord.file};
-            if(game->board[one.rank][one.file].piece == 0 && MoveIsLegal(game, piece->coord, one))
+            if(game->board[one.rank][one.file] == 0 && MoveIsLegal(game, piece->coord, one))
             {
                 arrpush(result, one);
 
                 int32 startRank = game->playersTurn == PLAYER_WHITE ? 1 : 6;
                 sq_coord two = (sq_coord){piece->coord.rank+2*game->dir, piece->coord.file};
-                if(piece->coord.rank == startRank && game->board[two.rank][two.file].piece == 0 && MoveIsLegal(game, piece->coord, two)) arrpush(result, two);
+                if(piece->coord.rank == startRank && game->board[two.rank][two.file] == 0 && MoveIsLegal(game, piece->coord, two)) arrpush(result, two);
             }
 
             //////// TAKING
             sq_coord left = (sq_coord){piece->coord.rank+1*game->dir, piece->coord.file-1};
             if(CoordIsValid(left))
             {
-                piece_info *pl = game->board[left.rank][left.file].piece;
+                piece_info *pl = game->board[left.rank][left.file];
                 if(MoveIsLegal(game, piece->coord, left))
                 {
                     if((pl != 0 && pl->owner != game->playersTurn) || (game->elPeasant && CoordEqual(game->elPeasantSq, left))) arrpush(result, left);
@@ -282,7 +183,7 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
             sq_coord right = (sq_coord){piece->coord.rank+1*game->dir, piece->coord.file+1};
             if(CoordIsValid(right))
             {
-                piece_info *pr = game->board[right.rank][right.file].piece;
+                piece_info *pr = game->board[right.rank][right.file];
                 if(MoveIsLegal(game, piece->coord, right))
                 {
                     if((pr != 0 && pr->owner != game->playersTurn) || (game->elPeasant && CoordEqual(game->elPeasantSq, right))) arrpush(result, right);
@@ -295,9 +196,9 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
         case BISHOP:
         case ROOK:
         {
-            sq_coord *patern = queenPatern;
-            if(piece->type == BISHOP) patern = bishopPatern;
-            else if(piece->type == ROOK) patern = rookPatern;
+            sq_coord *patern = game->movePaterns[QUEEN].moves;
+            if(piece->type == BISHOP) patern = game->movePaterns[BISHOP].moves;
+            else if(piece->type == ROOK) patern = game->movePaterns[ROOK].moves;
 
             for(int32 i = 0; i < arrlen(patern); ++i)
             {
@@ -305,10 +206,10 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
                 sq_coord coord = (sq_coord){piece->coord.rank+patern[i].rank*sqCount, piece->coord.file+patern[i].file*sqCount};
                 while(CoordIsValid(coord))
                 {
-                    square_info sq = game->board[coord.rank][coord.file];
-                    if(sq.piece != 0)
+                    piece_info *p = game->board[coord.rank][coord.file];
+                    if(p != 0)
                     {
-                        if(sq.piece->owner == game->playersTurn) break;
+                        if(p->owner == game->playersTurn) break;
 
                         if(MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
                         break;
@@ -326,38 +227,40 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
 
         case KNIGHT:
         {
-            for(int32 i = 0; i < arrlen(knightPatern); ++i)
+            sq_coord *patern = game->movePaterns[KNIGHT].moves;
+            for(int32 i = 0; i < arrlen(patern); ++i)
             {
-                sq_coord coord = (sq_coord){piece->coord.rank+knightPatern[i].rank, piece->coord.file+knightPatern[i].file};
+                sq_coord coord = (sq_coord){piece->coord.rank+patern[i].rank, piece->coord.file+patern[i].file};
                 if(CoordIsValid(coord) == false) continue;
 
-                square_info sq = game->board[coord.rank][coord.file];
+                piece_info *p= game->board[coord.rank][coord.file];
 
-                if(sq.piece == 0 && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
-                else if(sq.piece != 0 && sq.piece->owner != game->playersTurn && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
+                if(p == 0 && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
+                else if(p != 0 && p->owner != game->playersTurn && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
             }
 
         }   break;
 
         case KING:
         {
-            for(int32 i = 0; i < arrlen(queenPatern); ++i)
+            sq_coord *patern = game->movePaterns[KING].moves;
+            for(int32 i = 0; i < arrlen(patern); ++i)
             {
-                sq_coord coord = (sq_coord){piece->coord.rank+queenPatern[i].rank, piece->coord.file+queenPatern[i].file};
+                sq_coord coord = (sq_coord){piece->coord.rank+patern[i].rank, piece->coord.file+patern[i].file};
                 if(CoordIsValid(coord) == false) continue;
 
-                square_info sq = game->board[coord.rank][coord.file];
+                piece_info *p= game->board[coord.rank][coord.file];
 
-                if(sq.piece == 0 && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
-                else if(sq.piece != 0 && sq.piece->owner != game->playersTurn && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
+                if(p == 0 && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
+                else if(p != 0 && p->owner != game->playersTurn && MoveIsLegal(game, piece->coord, coord)) arrpush(result, coord);
             }
 
             if(piece->hasMoved == false)
             {
                 // castiling short
-                bool bishopEmpty = game->board[piece->coord.rank][piece->coord.file+1].piece == 0 ? true : false;
-                bool knightEmpty = game->board[piece->coord.rank][piece->coord.file+2].piece == 0 ? true : false;
-                piece_info *rook = game->board[piece->coord.rank][piece->coord.file+3].piece;
+                bool bishopEmpty = game->board[piece->coord.rank][piece->coord.file+1] == 0 ? true : false;
+                bool knightEmpty = game->board[piece->coord.rank][piece->coord.file+2] == 0 ? true : false;
+                piece_info *rook = game->board[piece->coord.rank][piece->coord.file+3];
                 bool rookCheck = (rook != 0 && rook->hasMoved == false) ? true : false;
                 
 
@@ -365,10 +268,10 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
                     arrpush(result, ((sq_coord){piece->coord.rank, piece->coord.file+2}));
 
                 // castiling long
-                bool queenEmpty = game->board[piece->coord.rank][piece->coord.file-1].piece == 0 ? true : false;
-                bishopEmpty = game->board[piece->coord.rank][piece->coord.file-2].piece == 0 ? true : false;
-                knightEmpty = game->board[piece->coord.rank][piece->coord.file-3].piece == 0 ? true : false;
-                rook = game->board[piece->coord.rank][piece->coord.file-4].piece;
+                bool queenEmpty = game->board[piece->coord.rank][piece->coord.file-1] == 0 ? true : false;
+                bishopEmpty = game->board[piece->coord.rank][piece->coord.file-2] == 0 ? true : false;
+                knightEmpty = game->board[piece->coord.rank][piece->coord.file-3] == 0 ? true : false;
+                rook = game->board[piece->coord.rank][piece->coord.file-4];
                 rookCheck = (rook != 0 && rook->hasMoved == false) ? true : false;
 
                 if(queenEmpty && bishopEmpty && knightEmpty && rookCheck && MoveIsLegal(game, piece->coord, (sq_coord){piece->coord.rank, piece->coord.file-1}) && MoveIsLegal(game, piece->coord, (sq_coord){piece->coord.rank, piece->coord.file-2})) 
@@ -384,17 +287,40 @@ internal sq_coord *CalcPossibleMoves(game_info *game, piece_info *piece)
     return result;
 }
 
+Rectangle RecForSquare(draw_info *drawInfo, sq_coord coord, bool center = false)
+{
+    Rectangle result = {0};
+    
+    int32 offset = center ? drawInfo->squareSize/2 : 0;
+
+    result = Rec(drawInfo->boardPos.x+drawInfo->squareSize*coord.file+offset, drawInfo->boardPos.y+drawInfo->boardDim.y-drawInfo->squareSize-drawInfo->squareSize*coord.rank+offset, drawInfo->squareSize, drawInfo->squareSize);
+
+    return result;
+}
+
+
+internal void EndTurn(game_info *game)
+{
+    if(game->playerMoved[game->playersTurn]) 
+        game->timer[game->playersTurn] += game->timeControl.increment;
+    game->draggedPiece = 0;
+    game->selectedPiece = 0;
+    game->playerMoved[game->playersTurn] = true;
+
+    game->playersTurn = game->playersTurn == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE;
+    //bi->flipped = game->playersTurn == PLAYER_WHITE ? false : true;
+    game->dir *= -1;
+}
 
 internal void GameUpdate(game_info *game, draw_info *drawInfo)
 {
-
     if(IsKeyPressed(KEY_R))
     {
         drawInfo->flipped = !drawInfo->flipped;
     }
     drawInfo->camera.rotation = drawInfo->flipped ? 180.0f : 0.0f;
 
-    square_info *squareUnderMouse = 0;
+    sq_coord squareUnderMouse = {-1, 0};
 
     {
         v2 boardStart = Vec2(drawInfo->flipped ? drawInfo->boardPos.x+drawInfo->boardDim.x : drawInfo->boardPos.x, drawInfo->flipped ? drawInfo->boardPos.y : drawInfo->boardPos.y + drawInfo->boardDim.y);
@@ -402,7 +328,8 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         int32 file = floor(abs(delta.x) / drawInfo->squareSize);
         int32 rank = floor(abs(delta.y) / drawInfo->squareSize);
 
-        if(file >= 0 && file < 8 && rank >= 0 && rank < 8) squareUnderMouse = &game->board[rank][file];
+        if(file >= 0 && file < 8 && rank >= 0 && rank < 8) squareUnderMouse = Coord(rank, file);
+        else squareUnderMouse = Coord(-1, 0);
     }
 
     if(game->playerMoved[game->playersTurn])
@@ -414,40 +341,76 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
             game->state = GAME_END;
         }
     }
-    
-    game->check = KingIsChecked(game->board, game->playersTurn == PLAYER_WHITE ? game->whiteKing : game->blackKing);
-    if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
+
+    if(game->promoting == PLAYER_NONE)
+    {
+        piece_type *allTypes = 0;
+        arrpush(allTypes, ROOK);
+        arrpush(allTypes, KNIGHT);
+        arrpush(allTypes, BISHOP);
+        arrpush(allTypes, QUEEN);
+        arrpush(allTypes, PAWN);
+        game->check =  PieceInSightOf(game, game->kingPos[game->playersTurn], allTypes, (player_color)(game->playersTurn*-1), Coord(-1, -1), Coord(-1, -1));
+        arrfree(allTypes);
+
+        if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
+    }
+    else
+    {
+        piece_type proms[4] = {QUEEN, ROOK, BISHOP, KNIGHT};
+
+        if(IsMouseButtonPressed(0))
+        {
+            sq_coord promCoord = game->selectedPiece->coord;
+
+            for(int32 i = 0; i < ArrayCount(proms); ++i)
+            {
+                Rectangle promRec = RecForSquare(drawInfo, promCoord);
+                if(CheckCollisionPointRec(GetMousePosition(), promRec))
+                {
+                    game->selectedPiece->type = proms[i];
+                    game->promoting = PLAYER_NONE;
+                    EndTurn(game);
+                    break;
+                }
+                
+                promCoord.rank += game->playersTurn*-1;
+            }
+        }
+        
+    }
+
     ///////////////////// PIECE SELECTION AND DRAGING ///////////////////////
     
-    if(game->selectedPiece != 0 && ((game->draggedPiece != 0 && IsMouseButtonReleased(0)) || IsMouseButtonPressed(0)))
+    if(game->selectedPiece != 0 && ((game->draggedPiece != 0 && IsMouseButtonReleased(0)) || IsMouseButtonPressed(0)) && game->promoting == PLAYER_NONE)
     {
-        if(squareUnderMouse != 0)
+        if(CoordIsValid(squareUnderMouse))
         {
-            if(CoordInArr(game->selectedPossibleMoves, squareUnderMouse->coord))
+            if(CoordInArr(game->selectedPossibleMoves, squareUnderMouse))
             {
-                if(game->selectedPiece->type == PAWN && (abs(game->selectedPiece->coord.rank - squareUnderMouse->coord.rank) == 2))
+                if((game->selectedPiece->type == PAWN) && (abs(game->selectedPiece->coord.rank - squareUnderMouse.rank) == 2))
                 {
                     game->elPeasant = game->playersTurn;
                     game->elPeasantSq = game->selectedPiece->coord;
                     game->elPeasantSq.rank += game->dir;
                 }
 
-                if(game->selectedPiece->type == KING && (abs(game->selectedPiece->coord.file - squareUnderMouse->coord.file) == 2))
+                if(game->selectedPiece->type == KING && (abs(game->selectedPiece->coord.file - squareUnderMouse.file) == 2))
                 {
-                    int32 castilingSide = squareUnderMouse->coord.file - game->selectedPiece->coord.file;
-                    piece_info *rook = castilingSide > 0 ? game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file+3].piece : game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file-4].piece;
-                    game->board[rook->coord.rank][rook->coord.file].piece = 0;
+                    int32 castilingSide = squareUnderMouse.file - game->selectedPiece->coord.file;
+                    piece_info *rook = castilingSide > 0 ? game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file+3] : game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file-4];
+                    game->board[rook->coord.rank][rook->coord.file] = 0;
                     rook->coord.file = castilingSide > 0 ? 5 : 3;
-                    game->board[rook->coord.rank][rook->coord.file].piece = rook;
+                    game->board[rook->coord.rank][rook->coord.file] = rook;
 
                 }
-                game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file].piece = 0;
-                piece_info *pieceTaken = game->board[squareUnderMouse->coord.rank][squareUnderMouse->coord.file].piece;
-                if(game->elPeasant && CoordEqual(squareUnderMouse->coord, game->elPeasantSq))
+                game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file] = 0;
+                piece_info *pieceTaken = game->board[squareUnderMouse.rank][squareUnderMouse.file];
+                if(game->elPeasant && CoordEqual(squareUnderMouse, game->elPeasantSq))
                 {
                     sq_coord take = game->elPeasantSq;
                     take.rank += game->dir*-1;
-                    pieceTaken = game->board[take.rank][take.file].piece;
+                    pieceTaken = game->board[take.rank][take.file];
                 }
 
                 if(pieceTaken != 0)
@@ -455,26 +418,28 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
                     arrpush(game->piecesTaken[game->playersTurn], *pieceTaken);
                     sq_coord clean = pieceTaken->coord;
                     free(pieceTaken);
-                    game->board[clean.rank][clean.file].piece = 0;
+                    game->board[clean.rank][clean.file] = 0;
                 }
-                game->board[squareUnderMouse->coord.rank][squareUnderMouse->coord.file].piece = game->selectedPiece;
-                game->selectedPiece->coord = squareUnderMouse->coord;
+                game->board[squareUnderMouse.rank][squareUnderMouse.file] = game->selectedPiece;
+                game->selectedPiece->coord = squareUnderMouse;
                 game->selectedPiece->hasMoved = true;
                 game->selectedPiece->isDragged = false;
 
                 if(game->selectedPiece->type == KING)
                 {
-                    game->playersTurn == PLAYER_WHITE ? (game->whiteKing = squareUnderMouse->coord) : (game->blackKing = squareUnderMouse->coord);
+                    game->kingPos[game->playersTurn] = squareUnderMouse;
                 }
 
-                game->draggedPiece = 0;
-                game->selectedPiece = 0;
-                if(game->playerMoved[game->playersTurn]) game->timer[game->playersTurn] += game->timeControl.increment;
-                game->playerMoved[game->playersTurn] = true;
-                game->playersTurn = game->playersTurn == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE;
-                //bi->flipped = game->playersTurn == PLAYER_WHITE ? false : true;
-                game->dir *= -1;
-                
+                if(game->selectedPiece->type == PAWN &&
+                    ((game->playersTurn == PLAYER_WHITE && game->selectedPiece->coord.rank == 7) || 
+                    (game->playersTurn == PLAYER_BLACK && game->selectedPiece->coord.rank == 0)))
+                {
+                    game->promoting = game->playersTurn;
+                }
+
+                if(game->promoting == PLAYER_NONE)
+                    EndTurn(game);
+
                 arrfree(game->selectedPossibleMoves);
             }
             else //if(squareUnderMouse->coord.rank == game->selectedPiece->coord.rank && squareUnderMouse->coord.file == game->selectedPiece->coord.file)
@@ -491,18 +456,21 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         }
     }
 
-    if(squareUnderMouse != 0 && squareUnderMouse->piece != 0 && squareUnderMouse->piece->owner == game->playersTurn)
+    if(CoordIsValid(squareUnderMouse) && 
+        game->board[squareUnderMouse.rank][squareUnderMouse.file] != 0 && 
+        game->board[squareUnderMouse.rank][squareUnderMouse.file]->owner == game->playersTurn &&
+        game->promoting == PLAYER_NONE)
     {
         if(IsMouseButtonPressed(0))
         {
-            game->selectedPiece = squareUnderMouse->piece;
+            game->selectedPiece = game->board[squareUnderMouse.rank][squareUnderMouse.file];
             if(game->selectedPossibleMoves != 0) arrfree(game->selectedPossibleMoves);
             game->selectedPossibleMoves = CalcPossibleMoves(game, game->selectedPiece);
         }
 
         if(IsMouseButtonDown(0) && game->selectedPiece != 0 && game->draggedPiece == 0)
         {
-            squareUnderMouse->piece->isDragged = true;
+            game->board[squareUnderMouse.rank][squareUnderMouse.file]->isDragged = true;
             game->draggedPiece = game->selectedPiece;
         }
     }
@@ -529,27 +497,16 @@ void DrawClocks(game_info *game, draw_info *drawInfo)
     DrawTextPro(drawInfo->clockFont, blackTimeText, drawInfo->blackTimeTextPos, Vec2(), 0.0f, drawInfo->clockFontSize, 1.0f, WHITE);
 }
 
-Rectangle RecForSquare(draw_info *drawInfo, sq_coord coord, bool center = false)
-{
-    Rectangle result = {0};
-    
-    int32 offset = center ? drawInfo->squareSize/2 : 0;
-
-    result = Rec(drawInfo->boardPos.x+drawInfo->squareSize*coord.file+offset, drawInfo->boardPos.y+drawInfo->boardDim.y-drawInfo->squareSize-drawInfo->squareSize*coord.rank+offset, drawInfo->squareSize, drawInfo->squareSize);
-
-    return result;
-}
-
-internal Rectangle TexRecForPiece(piece_info piece, Texture2D tex)
+internal Rectangle TexRecForPiece(piece_type type, player_color player, Texture2D tex)
 {
     Rectangle result = {0};
 
     result.width = tex.width / 6;
     result.height = tex.height / 2;
 
-    result.y = (piece.owner == PLAYER_WHITE) ? tex.height / 2 : 0;
+    result.y = (player == PLAYER_WHITE) ? tex.height / 2 : 0;
 
-    switch (piece.type)
+    switch (type)
     {
     case ROOK:
     {
@@ -587,6 +544,22 @@ internal Rectangle TexRecForPiece(piece_info piece, Texture2D tex)
 Rectangle _deferedRec;
 piece_info *_deferedPiece;
 
+void DrawPromotion(game_info *game, draw_info *drawInfo)
+{
+    piece_type proms[4] = {QUEEN, ROOK, BISHOP, KNIGHT};
+    sq_coord promCoord = game->selectedPiece->coord;
+
+    for(int32 i = 0; i < ArrayCount(proms); ++i)
+    {
+        Color promColor = game->playersTurn == PLAYER_WHITE ? BLACK : WHITE;
+        Rectangle promRec = RecForSquare(drawInfo, promCoord);
+        DrawRectanglePro(promRec, Vec2(), 0.0f, promColor);
+        Rectangle promTexRec = TexRecForPiece(proms[i], game->playersTurn, drawInfo->piecesTex);
+        DrawTexturePro(drawInfo->piecesTex, promTexRec, promRec, Vec2(), 0.0f, WHITE);
+        promCoord.rank += game->playersTurn*-1;
+    }
+}
+
 void DrawBoard(game_info *game, draw_info *drawInfo)
 {
     BeginMode2D(drawInfo->camera);
@@ -608,7 +581,7 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
 
     if(game->check)
     {
-        sq_coord kingSq = game->playersTurn == PLAYER_WHITE ? game->whiteKing : game->blackKing;
+        sq_coord kingSq = game->kingPos[game->playersTurn];
         Rectangle sqRec = RecForSquare(drawInfo, kingSq);
         DrawRectanglePro(sqRec, Vec2(), 0.0f, Fade(RED, 0.5f));
     }
@@ -623,24 +596,24 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
     {
         for(int32 f = 0; f < 8; ++f)
         {
-            square_info sq = game->board[r][f]; 
+            piece_info *piece = game->board[r][f]; 
 
-            if(sq.piece == 0) continue;
+            if(piece == 0) continue;
 
-            Rectangle pieceRec = RecForSquare(drawInfo, sq.coord, true);
+            Rectangle pieceRec = RecForSquare(drawInfo, piece->coord, true);
             
-            if(sq.piece->isDragged)
+            if(piece->isDragged)
             {
                 v2 mw = GetScreenToWorld2D(GetMousePosition(), drawInfo->camera);
                 pieceRec.x = mw.x;
                 pieceRec.y = mw.y;
 
                 _deferedRec = pieceRec;
-                _deferedPiece = sq.piece;
+                _deferedPiece = piece;
             }
             else
             {
-                DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(*sq.piece, drawInfo->piecesTex), pieceRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
+                DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(piece->type, piece->owner, drawInfo->piecesTex), pieceRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
             }
         }
     }
@@ -656,7 +629,7 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
             for(int32 i = 0; i < arrlen(takenPieces); ++i)
             {
                 int32 dir = (player_color)p == PLAYER_WHITE ? 1 : -1;
-                Rectangle pieceTexRec = TexRecForPiece(takenPieces[i], drawInfo->piecesTex);
+                Rectangle pieceTexRec = TexRecForPiece(takenPieces[i].type, takenPieces[i].owner, drawInfo->piecesTex);
                 Rectangle pieceBordRec = (player_color)p == PLAYER_WHITE ? RecForSquare(drawInfo, (sq_coord){0, 8}) : RecForSquare(drawInfo, (sq_coord){7, -1});
                 if((player_color)p == PLAYER_BLACK) 
                 {
@@ -682,7 +655,7 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
 
     if(_deferedPiece != 0)
     {
-        DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(*_deferedPiece, drawInfo->piecesTex), _deferedRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
+        DrawTexturePro(drawInfo->piecesTex, TexRecForPiece(_deferedPiece->type, _deferedPiece->owner, drawInfo->piecesTex), _deferedRec, Vec2(drawInfo->squareSize/2, drawInfo->squareSize/2), drawInfo->flipped ? 180.0f : 0.0f, WHITE);
         _deferedPiece = 0;
     }
 
@@ -704,4 +677,7 @@ void DrawBoard(game_info *game, draw_info *drawInfo)
     {
         DrawTextPro(drawInfo->boardFont, rankNumbers[i], Vec2(rStart.x, rStart.y-drawInfo->squareSize*rlIndex++), Vec2(), 0.0f, drawInfo->boardFontSize, 1.0f, RED);
     }
+
+    if(game->promoting) DrawPromotion(game, drawInfo);
 }
+

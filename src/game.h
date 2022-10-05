@@ -31,14 +31,14 @@ struct draw_info
 
 enum player_color
 {
+    PLAYER_BLACK = -1,
     PLAYER_NONE,
     PLAYER_WHITE,
-    PLAYER_BLACK,
 };
 
 enum piece_type
 {
-    PAWN,
+    PAWN = 0,
     KNIGHT,
     BISHOP,
     ROOK,
@@ -61,14 +61,16 @@ struct piece_info
     bool hasMoved;
 };
 
+enum move_patern_type { PATERN_CONTINUES = 0, PATERN_SINGLE };
 
-struct square_info
+struct move_patern
 {
-    sq_coord coord;
-    piece_info *piece; 
+    sq_coord *moves;
+    move_patern_type type;
 };
 
-enum game_state {GAME_SETUP, GAME_PLAY, GAME_END};
+
+enum game_state {GAME_SETUP = 0, GAME_PROMOTING, GAME_PLAY, GAME_END};
 
 struct game_time_control
 {
@@ -78,23 +80,23 @@ struct game_time_control
 
 struct game_info
 {
-    square_info board[8][8];
+    piece_info *board[8][8];
     game_state state;
     player_color playersTurn;
     piece_info *selectedPiece;
     piece_info *draggedPiece;
     sq_coord *selectedPossibleMoves;
-    sq_coord whiteKing;
-    sq_coord blackKing; 
-    piece_info *piecesTaken[3];
+    sq_coord *kingPos;
+    piece_info **piecesTaken;
     bool check;
     player_color elPeasant;
     sq_coord elPeasantSq;
     int32 dir;
     game_time_control timeControl;
-    double timer[3];
-    bool playerMoved[3];
-
+    double *timer;
+    bool *playerMoved;
+    move_patern movePaterns[6];
+    player_color promoting;
 };
 
 sq_coord Coord(int32 rank, int32 file)
