@@ -21,6 +21,10 @@ game_time_control timeControls[] = {
     (game_time_control){.start = 3.0*60.0, .increment = 2.0},
     (game_time_control){.start = 2.0*60.0, .increment = 1.0},
     (game_time_control){.start = 1.0*60.0, .increment = 1.0},
+    (game_time_control){.start = 10.0*60.0, .increment = 1.0},
+    (game_time_control){.start = 10.0*60.0, .increment = 2.0},
+    (game_time_control){.start = 10.0*60.0, .increment = 5.0},
+    (game_time_control){.start = 10.0*60.0, .increment = 10.0},
 };
 
 void GUISetup(game_info *game, draw_info *drawInfo)
@@ -59,7 +63,6 @@ void GUIUpdate(game_info *game)
         }
     }
 }
-
 
 void DrawGUI(draw_info *drawInfo)
 {

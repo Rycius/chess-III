@@ -9,6 +9,69 @@
 #include "chessPiecesImg.h"
 #endif
 
+internal void ExportPGN(game_move *moves)
+{
+    char *pgn = 0;
+
+    char pieceLeter[6] = {' ', 'N', 'B', 'R', 'Q', 'K'};
+    char fileLetters[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
+    for(int32 i = 0; i < arrlen(moves); ++i)
+    {
+        game_move move = moves[i];
+        // move number
+        if(i%2 == 0)
+        {
+            const char *moveNo = TextFormat("%d", (int32)round((i+1) / 2.0f));
+            for(int32 k = 0; k < TextLength(moveNo); ++k)
+            {
+                arrpush(pgn, moveNo[k]);
+            }
+            arrpush(pgn, '.');
+            arrpush(pgn, ' ');
+        }
+        
+        if(move.castilingK)
+        {
+            arrpush(pgn, '0');
+            arrpush(pgn, '-');
+            arrpush(pgn, '0');
+        }
+        else if(move.castilingQ)
+        {
+            arrpush(pgn, '0');
+            arrpush(pgn, '-');
+            arrpush(pgn, '0');
+            arrpush(pgn, '-');
+            arrpush(pgn, '0');
+        }
+        else
+        {
+            if(move.piece != PAWN)
+                arrpush(pgn, pieceLeter[move.piece]);
+            else if(move.capture)
+                arrpush(pgn, fileLetters[move.from.file]);
+
+            if(move.capture)
+                arrpush(pgn, 'x');
+
+            arrpush(pgn, fileLetters[move.to.file]);
+            arrpush(pgn, TextFormat("%d", move.to.rank)[0]+1);
+
+            if(move.check)
+                arrpush(pgn, '+');
+        }
+        
+        arrpush(pgn, ' ');
+    }
+
+    arrpush(pgn, '\0');
+
+    SaveFileText("pgn.txt", pgn);
+
+    arrfree(pgn);
+}
+
 internal void HandleScreenResize(draw_info *drawInfo)
 {
 #define BOARD_BORDER 10.0f
@@ -215,6 +278,8 @@ int main(void)
             case GAME_PLAY:
             {
                 GameUpdate(&game, &drawInfo);
+
+                if(IsKeyPressed(KEY_S)) ExportPGN(game.moves);
 
             } break;
 

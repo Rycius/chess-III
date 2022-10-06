@@ -301,6 +301,19 @@ Rectangle RecForSquare(draw_info *drawInfo, sq_coord coord, bool center = false)
 
 internal void EndTurn(game_info *game)
 {
+    piece_type *allTypes = 0;
+    arrpush(allTypes, ROOK);
+    arrpush(allTypes, KNIGHT);
+    arrpush(allTypes, BISHOP);
+    arrpush(allTypes, QUEEN);
+    arrpush(allTypes, PAWN);
+    game->check =  PieceInSightOf(game, game->kingPos[game->playersTurn*-1], allTypes, (player_color)(game->playersTurn), Coord(-1, -1), Coord(-1, -1));
+    arrfree(allTypes);
+
+    game->moves[arrlen(game->moves)-1].check = game->check;
+
+    if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
+
     if(game->playerMoved[game->playersTurn]) 
         game->timer[game->playersTurn] += game->timeControl.increment;
     game->draggedPiece = 0;
@@ -342,20 +355,7 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         }
     }
 
-    if(game->promoting == PLAYER_NONE)
-    {
-        piece_type *allTypes = 0;
-        arrpush(allTypes, ROOK);
-        arrpush(allTypes, KNIGHT);
-        arrpush(allTypes, BISHOP);
-        arrpush(allTypes, QUEEN);
-        arrpush(allTypes, PAWN);
-        game->check =  PieceInSightOf(game, game->kingPos[game->playersTurn], allTypes, (player_color)(game->playersTurn*-1), Coord(-1, -1), Coord(-1, -1));
-        arrfree(allTypes);
-
-        if(game->elPeasant == game->playersTurn) game->elPeasant = PLAYER_NONE;
-    }
-    else
+    if(game->promoting != PLAYER_NONE)
     {
         piece_type proms[4] = {QUEEN, ROOK, BISHOP, KNIGHT}; 
 
@@ -373,11 +373,10 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
                     EndTurn(game);
                     break;
                 }
-                
+
                 promCoord.rank += game->playersTurn*-1;
             }
-        }
-        
+        } 
     }
 
     ///////////////////// PIECE SELECTION AND DRAGING ///////////////////////
@@ -388,6 +387,12 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
         {
             if(CoordInArr(game->selectedPossibleMoves, squareUnderMouse))
             {
+                game_move move = {0};
+                move.player = game->playersTurn;
+                move.piece = game->selectedPiece->type;
+                move.from = game->selectedPiece->coord;
+                move.to = squareUnderMouse;
+
                 if((game->selectedPiece->type == PAWN) && (abs(game->selectedPiece->coord.rank - squareUnderMouse.rank) == 2))
                 {
                     game->elPeasant = game->playersTurn;
@@ -403,6 +408,9 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
                     rook->coord.file = castilingSide > 0 ? 5 : 3;
                     game->board[rook->coord.rank][rook->coord.file] = rook;
 
+                    move.castilingK = castilingSide < 0;
+                    move.castilingQ = castilingSide > 0;
+
                 }
                 game->board[game->selectedPiece->coord.rank][game->selectedPiece->coord.file] = 0;
                 piece_info *pieceTaken = game->board[squareUnderMouse.rank][squareUnderMouse.file];
@@ -415,10 +423,14 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
 
                 if(pieceTaken != 0)
                 {
+                    move.capture = true;
+                    move.campturePiece = pieceTaken->type;
+
                     arrpush(game->piecesTaken[game->playersTurn], *pieceTaken);
                     sq_coord clean = pieceTaken->coord;
                     free(pieceTaken);
                     game->board[clean.rank][clean.file] = 0;
+
                 }
                 game->board[squareUnderMouse.rank][squareUnderMouse.file] = game->selectedPiece;
                 game->selectedPiece->coord = squareUnderMouse;
@@ -437,10 +449,13 @@ internal void GameUpdate(game_info *game, draw_info *drawInfo)
                     game->promoting = game->playersTurn;
                 }
 
+                arrpush(game->moves, move);
+
                 if(game->promoting == PLAYER_NONE)
                     EndTurn(game);
 
                 arrfree(game->selectedPossibleMoves);
+
             }
             else //if(squareUnderMouse->coord.rank == game->selectedPiece->coord.rank && squareUnderMouse->coord.file == game->selectedPiece->coord.file)
             {

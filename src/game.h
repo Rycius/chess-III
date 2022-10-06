@@ -38,7 +38,7 @@ enum player_color
 
 enum piece_type
 {
-    PAWN = 0,
+    PAWN,
     KNIGHT,
     BISHOP,
     ROOK,
@@ -78,6 +78,19 @@ struct game_time_control
     double increment;
 };
 
+struct game_move
+{
+    sq_coord from;
+    sq_coord to;
+    piece_type piece;
+    player_color player;
+    bool capture;
+    piece_type campturePiece;
+    bool check;
+    bool castilingQ;
+    bool castilingK; 
+};
+
 struct game_info
 {
     piece_info *board[8][8];
@@ -97,6 +110,7 @@ struct game_info
     bool *playerMoved;
     move_patern movePaterns[6];
     player_color promoting;
+    game_move *moves;
 };
 
 sq_coord Coord(int32 rank, int32 file)
